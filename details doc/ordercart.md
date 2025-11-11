@@ -1,7 +1,7 @@
-# OrderCart Mini - Product Details Document
+# OrderCart - Product Details Document
 
 ## Product Overview
-**OrderCart Mini** is a streamlined order management system focused on the essential features needed to eliminate manual processing fatigue, reduce errors, and automate repetitive order workflows. Perfect for small to medium businesses ready to upgrade from spreadsheets.
+**OrderCart** is a streamlined order management system focused on the essential features needed to eliminate manual processing fatigue, reduce errors, and automate repetitive order workflows. Perfect for small to medium businesses ready to upgrade from spreadsheets.
 
 ---
 
