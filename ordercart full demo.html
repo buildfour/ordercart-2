@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrderCart - Fully Functional Demo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --oxford-blue: #002147;
+            --aquamarine: #7FFFD4;
+            --bg-light: #f8f9fc;
+            --bg-dark: #0f1419;
+            --card-light: #ffffff;
+            --card-dark: #1a1f2e;
+            --text-light: #1a1a1a;
+            --text-dark: #e8eef5;
+            --border-light: #e1e8f0;
+            --border-dark: #2a3142;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        body { font-family: 'Nunito',sans-serif; background: var(--bg-light); color: var(--text-light); transition: all 0.3s ease; line-height: 1.6; }
+        body.dark-mode { background: var(--bg-dark); color: var(--text-dark); }
+        .top-nav { background: var(--oxford-blue); color: white; padding: 1rem; position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow-md); border-bottom: 2px solid var(--aquamarine); display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+        .logo { font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .logo i { color: var(--aquamarine); }
+        .search-bar { flex: 1; max-width: 400px; display: flex; align-items: center; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem 1rem; }
+        .search-bar input { background: none; border: none; color: white; width: 100%; font-family: 'Nunito'; outline: none; }
+        .search-bar input::placeholder { color: rgba(255,255,255,0.5); }
+        .nav-actions { display: flex; gap: 1rem; align-items: center; }
+        .icon-btn { background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem; position: relative; transition: all 0.2s; }
+        .icon-btn:hover { color: var(--aquamarine); transform: scale(1.1); }
+        .badge { position: absolute; top: -8px; right: -8px; background: var(--danger); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; }
+        .app-container { display: flex; min-height: calc(100vh - 60px); }
+        .sidebar { width: 250px; background: var(--card-light); border-right: 1px solid var(--border-light); padding: 1rem 0; overflow-y: auto; }
+        body.dark-mode .sidebar { background: var(--card-dark); border-color: var(--border-dark); }
+        .sidebar-item { padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s; color: inherit; text-decoration: none; font-weight: 500; }
+        .sidebar-item:hover { background: var(--aquamarine); color: var(--oxford-blue); transform: translateX(4px); }
+        .sidebar-item.active { background: var(--oxford-blue); color: white; box-shadow: var(--shadow-md); }
+        .main-content { flex: 1; padding: 2rem; overflow-y: auto; background: var(--bg-light); }
+        body.dark-mode .main-content { background: var(--bg-dark); }
+        .alert-banner { background: linear-gradient(135deg, var(--danger), #c92a2a); color: white; padding: 1.5rem; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; box-shadow: var(--shadow-lg); }
+        .alert-content { display: flex; align-items: center; gap: 1rem; flex: 1; }
+        .btn { border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: 'Nunito'; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary { background: var(--oxford-blue); color: white; }
+        .btn-primary:hover { background: var(--aquamarine); color: var(--oxford-blue); transform: translateY(-2px); }
+        .btn-secondary { background: var(--aquamarine); color: var(--oxford-blue); }
+        .btn-secondary:hover { background: #5eead4; transform: translateY(-2px); }
+        .btn-small { padding: 0.5rem 1rem; font-size: 0.85rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--card-light); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow-sm); transition: all 0.3s; border: 1px solid var(--border-light); }
+        body.dark-mode .stat-card { background: var(--card-dark); border-color: var(--border-dark); }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .stat-value { font-size: 2rem; font-weight: 700; }
+        .stat-value.aquamarine { color: var(--aquamarine); }
+        .stat-value.oxford { color: var(--oxford-blue); }
+        .stat-value.success { color: var(--success); }
+        .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .section-title i { color: var(--aquamarine); }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .card { background: var(--card-light); border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow-sm); border-left: 4px solid; transition: all 0.3s; }
+        body.dark-mode .card { background: var(--card-dark); }
+        .card.urgent { border-left-color: var(--danger); }
+        .card.moderate { border-left-color: var(--warning); }
+        .card.normal { border-left-color: var(--success); }
+        .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .badge-danger { background: #fee2e2; color: #991b1b; padding: 0.3rem 0.7rem; border-radius: 6px; font-size: 0.8rem; font-weight: 700; display: inline-block; margin-bottom: 0.5rem; }
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 2px solid var(--border-light); }
+        body.dark-mode .tabs { border-color: var(--border-dark); }
+        .tab { padding: 1rem 1.25rem; cursor: pointer; border-bottom: 3px solid transparent; font-weight: 600; transition: all 0.2s; }
+        .tab.active { border-bottom-color: var(--aquamarine); color: var(--oxford-blue); }
+        body.dark-mode .tab.active { color: var(--aquamarine); }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: var(--card-light); padding: 2rem; border-radius: 12px; max-width: 600px; width: 90%; box-shadow: var(--shadow-lg); }
+        body.dark-mode .modal-content { background: var(--card-dark); }
+        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-light); }
+        .form-input { width: 100%; padding: 0.75rem; border: 1px solid var(--border-light); border-radius: 8px; font-family: 'Nunito'; margin-bottom: 1rem; }
+        body.dark-mode .form-input { background: var(--card-dark); border-color: var(--border-dark); color: var(--text-dark); }
+        .hidden { display: none !important; }
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; padding: 1rem 0; }
+            .search-bar { display: none; }
+            .cards-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="logo"><i class="fas fa-box"></i> <span>OrderCart</span></div>
+        <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Search..."></div>
+        <div class="nav-actions">
+            <button class="icon-btn" id="notificationsBtn"><i class="fas fa-bell"></i><span class="badge">4</span></button>
+            <button class="icon-btn" id="themeBtn"><i class="fas fa-moon"></i></button>
+            <button class="icon-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-item active" onclick="app.goToPage('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</div>
+            <div class="sidebar-item" onclick="app.goToPage('capture')"><i class="fas fa-inbox"></i> Capture</div>
+            <div class="sidebar-item" onclick="app.goToPage('orders')"><i class="fas fa-tasks"></i> Orders</div>
+            <div class="sidebar-item" onclick="app.goToPage('exceptions')"><i class="fas fa-triangle-exclamation"></i> Exceptions</div>
+            <div class="sidebar-item" onclick="app.goToPage('batches')"><i class="fas fa-boxes"></i> Batches</div>
+            <div class="sidebar-item" onclick="app.goToPage('communications')"><i class="fas fa-envelope"></i> Communications</div>
+            <div class="sidebar-item" onclick="app.goToPage('analytics')"><i class="fas fa-chart-bar"></i> Analytics</div>
+            <div class="sidebar-item" onclick="app.goToPage('settings')"><i class="fas fa-sliders"></i> Settings</div>
+            <div class="sidebar-item" onclick="app.goToPage('help')"><i class="fas fa-circle-question"></i> Help</div>
+        </aside>
+
+        <main class="main-content" id="mainContent">
+            <!-- DASHBOARD -->
+            <div id="page-dashboard" class="page">
+                <div class="alert-banner">
+                    <div class="alert-content"><i class="fas fa-circle-exclamation"></i><div><strong>4 urgent orders need attention</strong><p style="font-size:0.9rem; opacity:0.9;">2 approaching deadline, 1 payment issue, 1 inventory conflict</p></div></div>
+                    <button class="btn btn-primary" onclick="app.goToPage('exceptions')">Start Now</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card"><div style="opacity:0.7; margin-bottom:0.5rem;">Orders Today</div><div class="stat-value aquamarine">24</div><div style="font-size:0.85rem; margin-top:0.5rem; color:var(--success);"><i class="fas fa-arrow-up"></i> 18% vs yesterday</div></div>
+                    <div class="stat-card"><div style="opacity:0.7; margin-bottom:0.5rem;">Processing</div><div class="stat-value oxford">12</div><div style="font-size:0.85rem; margin-top:0.5rem; color:var(--success);"><i class="fas fa-arrow-up"></i> All on schedule</div></div>
+                    <div class="stat-card"><div style="opacity:0.7; margin-bottom:0.5rem;">Exceptions</div><div class="stat-value warning">4</div><div style="font-size:0.85rem; margin-top:0.5rem; color:var(--success);"><i class="fas fa-arrow-down"></i> 2 resolved</div></div>
+                    <div class="stat-card"><div style="opacity:0.7; margin-bottom:0.5rem;">Completed</div><div class="stat-value success">156</div><div style="font-size:0.85rem; margin-top:0.5rem; color:var(--success);"><i class="fas fa-arrow-up"></i> 12% rate</div></div>
+                </div>
+
+                <h2 class="section-title"><i class="fas fa-bolt"></i> Priority Actions</h2>
+                <div class="cards-grid">
+                    <div class="card urgent">
+                        <h3>ORD-001 • Sarah Lee</h3>
+                        <p style="opacity:0.7; margin:0.5rem 0;">10 Red Mugs • $450</p>
+                        <span class="badge-danger">URGENT - 2h deadline</span>
+                        <div style="margin-top:1rem;"><button class="btn btn-primary btn-small" onclick="app.updateOrder('ORD-001')">Process Now</button></div>
+                    </div>
+                    <div class="card urgent">
+                        <h3>ORD-004 • Michael Brown</h3>
+                        <p style="opacity:0.7; margin:0.5rem 0;">8 White Bowls • $540</p>
+                        <span class="badge-danger">URGENT - 3h deadline</span>
+                        <div style="margin-top:1rem;"><button class="btn btn-primary btn-small" onclick="app.shipOrder('ORD-004')">Ship Now</button></div>
+                    </div>
+                    <div class="card moderate">
+                        <h3>BATCH-001 • California Orders</h3>
+                        <p style="opacity:0.7; margin:0.5rem 0;">12 orders • 22 min savings</p>
+                        <span class="badge-danger" style="background:#fef3c7; color:#92400e;">SUGGESTED</span>
+                        <div style="margin-top:1rem;"><button class="btn btn-secondary btn-small" onclick="app.goToPage('batches')">View Batch</button></div>
+                    </div>
+                </div>
+
+                <h2 class="section-title" style="margin-top:3rem;"><i class="fas fa-history"></i> Recent Activity</h2>
+                <div class="stat-card">
+                    <div style="display:flex; flex-direction:column; gap:1rem;">
+                        <div><i class="fas fa-check-circle" style="color:var(--success); margin-right:0.5rem;"></i><strong>ORD-002</strong> moved to Processing<div style="font-size:0.85rem; opacity:0.6;">2 minutes ago</div></div>
+                        <div><i class="fas fa-camera" style="color:var(--aquamarine); margin-right:0.5rem;"></i><strong>AI extraction</strong> completed for invoice<div style="font-size:0.85rem; opacity:0.6;">5 minutes ago</div></div>
+                        <div><i class="fas fa-exclamation" style="color:var(--danger); margin-right:0.5rem;"></i><strong>Exception flagged</strong> for ORD-005<div style="font-size:0.85rem; opacity:0.6;">8 minutes ago</div></div>
+                        <div><i class="fas fa-layer-group" style="color:var(--aquamarine); margin-right:0.5rem;"></i><strong>Batch suggested</strong> - California Orders<div style="font-size:0.85rem; opacity:0.6;">12 minutes ago</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CAPTURE -->
+            <div id="page-capture" class="page hidden">
+                <h2 class="section-title"><i class="fas fa-inbox"></i> Order Capture Hub</h2>
+                <p style="opacity:0.7; margin-bottom:2rem;">Multiple channels to instantly add orders</p>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:1.5rem; margin-bottom:2rem;">
+                    <div class="stat-card" style="text-align:center; cursor:pointer;" onclick="app.selectCapture('photo')"><i class="fas fa-camera" style="font-size:2.5rem; color:var(--aquamarine); display:block; margin-bottom:0.5rem;"></i>Camera</div>
+                    <div class="stat-card" style="text-align:center; cursor:pointer;" onclick="app.selectCapture('voice')"><i class="fas fa-microphone" style="font-size:2.5rem; color:var(--aquamarine); display:block; margin-bottom:0.5rem;"></i>Voice</div>
+                    <div class="stat-card" style="text-align:center; cursor:pointer;" onclick="app.selectCapture('file')"><i class="fas fa-file-import" style="font-size:2.5rem; color:var(--aquamarine); display:block; margin-bottom:0.5rem;"></i>File</div>
+                    <div class="stat-card" style="text-align:center; cursor:pointer;" onclick="app.selectCapture('manual')"><i class="fas fa-keyboard" style="font-size:2.5rem; color:var(--aquamarine); display:block; margin-bottom:0.5rem;"></i>Manual</div>
+                </div>
+                <div class="stat-card" style="text-align:center; padding:3rem; min-height:400px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:2px dashed var(--border-light);">
+                    <i class="fas fa-hand-pointer" style="font-size:3rem; color:var(--aquamarine); margin-bottom:1rem; opacity:0.5;"></i>
+                    <h3>Select a capture method above</h3>
+                    <p style="opacity:0.6; margin-top:1rem;">AI will extract and validate your order data automatically</p>
+                </div>
+            </div>
+
+            <!-- ORDERS -->
+            <div id="page-orders" class="page hidden">
+                <h2 class="section-title"><i class="fas fa-tasks"></i> Order Board</h2>
+                <p style="opacity:0.7; margin-bottom:2rem;">Visual workflow management</p>
+                <div style="display:flex; gap:1rem; overflow-x:auto; padding-bottom:1rem;">
+                    <div style="min-width:250px; background:var(--card-light); border-radius:12px; padding:1rem;">
+                        <div style="background:var(--oxford-blue); color:white; text-align:center; padding:0.75rem; border-radius:8px; margin-bottom:1rem; font-weight:700;">New</div>
+                        <div class="card" style="margin-bottom:1rem;"><strong>ORD-003</strong><p style="font-size:0.9rem; opacity:0.7;">Emma Davis • 15 Green Cups • $680</p></div>
+                    </div>
+                    <div style="min-width:250px; background:var(--card-light); border-radius:12px; padding:1rem;">
+                        <div style="background:var(--aquamarine); color:var(--oxford-blue); text-align:center; padding:0.75rem; border-radius:8px; margin-bottom:1rem; font-weight:700;">Validated</div>
+                        <div class="card urgent" style="margin-bottom:1rem;"><strong>ORD-001</strong><p style="font-size:0.9rem; opacity:0.7;">Sarah Lee • 10 Red Mugs • $450</p></div>
+                    </div>
+                    <div style="min-width:250px; background:var(--card-light); border-radius:12px; padding:1rem;">
+                        <div style="background:var(--oxford-blue); color:white; text-align:center; padding:0.75rem; border-radius:8px; margin-bottom:1rem; font-weight:700;">Processing</div>
+                        <div class="card moderate" style="margin-bottom:1rem;"><strong>ORD-002</strong><p style="font-size:0.9rem; opacity:0.7;">John Smith • 5 Blue Plates • $320</p></div>
+                    </div>
+                    <div style="min-width:250px; background:var(--card-light); border-radius:12px; padding:1rem;">
+                        <div style="background:var(--aquamarine); color:var(--oxford-blue); text-align:center; padding:0.75rem; border-radius:8px; margin-bottom:1rem; font-weight:700;">Packed</div>
+                        <div class="card urgent" style="margin-bottom:1rem;"><strong>ORD-004</strong><p style="font-size:0.9rem; opacity:0.7;">Michael Brown • 8 White Bowls • $540</p></div>
+                    </div>
+                    <div style="min-width:250px; background:var(--card-light); border-radius:12px; padding:1rem;">
+                        <div style="background:var(--oxford-blue); color:white; text-align:center; padding:0.75rem; border-radius:8px; margin-bottom:1rem; font-weight:700;">Shipped</div>
+                        <div class="card normal" style="margin-bottom:1rem;"><strong>ORD-007</strong><p style="font-size:0.9rem; opacity:0.7;">Lisa Wong • 20 Pink Mugs • $900</p></div>
+                    </div>
+                    <div style="min-width:250px; background:var(--card-light); border-radius:12px; padding:1rem;">
+                        <div style="background:var(--aquamarine); color:var(--oxford-blue); text-align:center; padding:0.75rem; border-radius:8px; margin-bottom:1rem; font-weight:700;">Delivered</div>
+                        <div class="card normal" style="margin-bottom:1rem;"><strong>ORD-008</strong><p style="font-size:0.9rem; opacity:0.7;">James Park • 12 Yellow Bowls • $600</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXCEPTIONS -->
+            <div id="page-exceptions" class="page hidden">
+                <h2 class="section-title"><i class="fas fa-triangle-exclamation"></i> Exception Queue</h2>
+                <p style="opacity:0.7; margin-bottom:2rem;">AI-powered problem resolution</p>
+                <div class="tabs">
+                    <div class="tab active" onclick="app.filterTab('all')">All</div>
+                    <div class="tab" onclick="app.filterTab('payment')">Payment</div>
+                    <div class="tab" onclick="app.filterTab('inventory')">Inventory</div>
+                    <div class="tab" onclick="app.filterTab('address')">Address</div>
+                </div>
+                <div class="cards-grid">
+                    <div class="card urgent" data-type="payment">
+                        <span class="badge-danger">PAYMENT ISSUE</span>
+                        <h3>EXC-001 • ORD-005</h3>
+                        <p style="opacity:0.7; margin:0.5rem 0;">Payment method declined • Jennifer Wilson • $890</p>
+                        <div style="background:rgba(127,255,212,0.08); padding:1rem; border-radius:8px; border-left:3px solid var(--aquamarine); margin:1rem 0;">
+                            <strong style="color:var(--aquamarine);"><i class="fas fa-wand-magic-sparkles"></i> AI Suggestion</strong>
+                            <p style="margin-top:0.5rem; font-size:0.9rem;">Contact customer for alternative payment. Personalized email ready to send.</p>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="app.applyFix('EXC-001')"><i class="fas fa-wand-magic-sparkles"></i> Apply AI Fix</button>
+                    </div>
+
+                    <div class="card moderate" data-type="inventory">
+                        <span class="badge-danger" style="background:#fef3c7; color:#92400e;">INVENTORY ISSUE</span>
+                        <h3>EXC-002 • ORD-006</h3>
+                        <p style="opacity:0.7; margin:0.5rem 0;">Item out of stock • Robert Chen • $450 • SKU-447</p>
+                        <div style="background:rgba(127,255,212,0.08); padding:1rem; border-radius:8px; border-left:3px solid var(--aquamarine); margin:1rem 0;">
+                            <strong style="color:var(--aquamarine);"><i class="fas fa-wand-magic-sparkles"></i> AI Suggestion</strong>
+                            <p style="margin-top:0.5rem; font-size:0.9rem;">Offer substitute product or delay notification with restock estimate.</p>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="app.applyFix('EXC-002')"><i class="fas fa-wand-magic-sparkles"></i> Apply AI Fix</button>
+                    </div>
+
+                    <div class="card moderate" data-type="address">
+                        <span class="badge-danger" style="background:#e0e7ff; color:#3730a3;">ADDRESS ISSUE</span>
+                        <h3>EXC-003 • ORD-009</h3>
+                        <p style="opacity:0.7; margin:0.5rem 0;">Address validation failed • David Kim • $320</p>
+                        <div style="background:rgba(127,255,212,0.08); padding:1rem; border-radius:8px; border-left:3px solid var(--aquamarine); margin:1rem 0;">
+                            <strong style="color:var(--aquamarine);"><i class="fas fa-wand-magic-sparkles"></i> AI Suggestion</strong>
+                            <p style="margin-top:0.5rem; font-size:0.9rem;">Request address confirmation with USPS autocomplete suggestions.</p>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="app.applyFix('EXC-003')"><i class="fas fa-wand-magic-sparkles"></i> Apply AI Fix</button>
+                    </div>
+
+                    <div class="card urgent" data-type="payment">
+                        <span class="badge-danger">DATA ISSUE</span>
+                        <h3>EXC-004 • ORD-010</h3>
+                        <p style="opacity:0.7; margin:0.5rem 0;">Email format invalid • Maria Lopez • $275</p>
+                        <div style="background:rgba(127,255,212,0.08); padding:1rem; border-radius:8px; border-left:3px solid var(--aquamarine); margin:1rem 0;">
+                            <strong style="color:var(--aquamarine);"><i class="fas fa-wand-magic-sparkles"></i> AI Suggestion</strong>
+                            <p style="margin-top:0.5rem; font-size:0.9rem;">Suggest corrections or prompt customer clarification via phone.</p>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="app.applyFix('EXC-004')"><i class="fas fa-wand-magic-sparkles"></i> Apply AI Fix</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BATCHES -->
+            <div id="page-batches" class="page hidden">
+                <h2 class="section-title"><i class="fas fa-boxes"></i> Batch Manager</h2>
+                <p style="opacity:0.7; margin-bottom:2rem;">AI-optimized batch processing</p>
+                <div class="stat-card" style="background:linear-gradient(135deg, var(--oxford-blue), rgba(127,255,212,0.3)); color:white; margin-bottom:2rem;">
+                    <h3><i class="fas fa-lightbulb"></i> AI Batch Suggestions</h3>
+                    <p style="margin-top:0.5rem;">Based on your orders, here are optimal batches to maximize throughput</p>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:1rem;">
+                    <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div><h3 style="margin-bottom:0.5rem;">BATCH-001: California Orders</h3><p style="opacity:0.7;">12 orders • Same region • 22 min savings</p><span style="background:var(--aquamarine); color:var(--oxford-blue); padding:0.3rem 0.7rem; border-radius:6px; font-size:0.8rem; font-weight:700; margin-top:0.5rem; display:inline-block;">Active</span></div>
+                        <div style="display:flex; gap:0.5rem;"><button class="btn btn-secondary btn-small">Print Labels</button><button class="btn btn-secondary btn-small">Mark Shipped</button></div>
+                    </div>
+                    <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div><h3 style="margin-bottom:0.5rem;">BATCH-002: Same-Day Shipping</h3><p style="opacity:0.7;">8 orders • Deadline today • 15 min savings</p><span style="background:#fef3c7; color:#92400e; padding:0.3rem 0.7rem; border-radius:6px; font-size:0.8rem; font-weight:700; margin-top:0.5rem; display:inline-block;">Pending</span></div>
+                        <button class="btn btn-primary btn-small" onclick="alert('✓ Batch created successfully!')">Create Batch</button>
+                    </div>
+                    <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div><h3 style="margin-bottom:0.5rem;">BATCH-003: Product Type Grouping</h3><p style="opacity:0.7;">6 orders • Ceramic items • 10 min savings</p><span style="background:#e0e7ff; color:#3730a3; padding:0.3rem 0.7rem; border-radius:6px; font-size:0.8rem; font-weight:700; margin-top:0.5rem; display:inline-block;">Suggested</span></div>
+                        <button class="btn btn-primary btn-small" onclick="alert('✓ Batch created successfully!')">Create Batch</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMMUNICATIONS -->
+            <div id="page-communications" class="page hidden">
+                <h2 class="section-title"><i class="fas fa-envelope"></i> Customer Communications</h2>
+                <p style="opacity:0.7; margin-bottom:2rem;">AI-generated templates and communication history</p>
+                <div class="stat-card" style="margin-bottom:2rem;">
+                    <h3 style="margin-bottom:1rem;"><i class="fas fa-plus"></i> Send Communication</h3>
+                    <label style="display:block; margin-bottom:1rem; font-weight:600;">Select Template</label>
+                    <select class="form-input" onchange="app.loadTemplate()">
+                        <option value="">-- Choose Template --</option>
+                        <option value="confirmation">Order Confirmation</option>
+                        <option value="shipping">Shipping Notification</option>
+                        <option value="delay">Delay Alert</option>
+                        <option value="delivery">Delivery Complete</option>
+                    </select>
+                    <label style="display:block; margin-bottom:1rem; font-weight:600;">Customer Email</label>
+                    <input type="email" class="form-input" placeholder="customer@example.com">
+                    <label style="display:block; margin-bottom:1rem; font-weight:600;">Message Preview</label>
+                    <textarea id="msgPreview" class="form-input" style="height:150px; resize:vertical; margin-bottom:1rem;" readonly>Select a template to preview...</textarea>
+                    <button class="btn btn-primary" onclick="alert('✓ Communication sent!')"><i class="fas fa-paper-plane"></i> Send Now</button>
+                </div>
+
+                <h3 style="margin-bottom:1rem;"><i class="fas fa-history"></i> Recent Communications</h3>
+                <div class="stat-card">
+                    <div style="display:flex; justify-content:space-between; padding-bottom:1rem; border-bottom:1px solid var(--border-light);"><div><strong>Order Confirmation</strong> → ORD-001<div style="font-size:0.85rem; opacity:0.6;">✓ Sent 2 hours ago</div></div><i class="fas fa-check-circle" style="color:var(--success);"></i></div>
+                    <div style="display:flex; justify-content:space-between; padding:1rem 0; border-bottom:1px solid var(--border-light);"><div><strong>Shipping Notification</strong> → ORD-007<div style="font-size:0.85rem; opacity:0.6;">✓ Sent 30 minutes ago</div></div><i class="fas fa-check-circle" style="color:var(--success);"></i></div>
+                    <div style="display:flex; justify-content:space-between; padding-top:1rem;"><div><strong>Payment Request</strong> → ORD-005<div style="font-size:0.85rem; opacity:0.6;">⏱ Scheduled for 3:00 PM</div></div><i class="fas fa-hourglass" style="color:var(--warning);"></i></div>
+                </div>
+            </div>
+
+            <!-- ANALYTICS -->
+            <div id="page-analytics" class="page hidden">
+                <h2 class="section-title"><i class="fas fa-chart-bar"></i> Analytics & Insights</h2>
+                <p style="opacity:0.7; margin-bottom:2rem;">Performance metrics and AI recommendations</p>
+                <div class="stats-grid">
+                    <div class="stat-card"><div style="opacity:0.7; margin-bottom:0.5rem;">Order Flow Rate</div><div class="stat-value success">18/hr</div><div style="font-size:0.85rem; margin-top:0.5rem; color:var(--success);"><i class="fas fa-arrow-up"></i> 12% increase</div></div>
+                    <div class="stat-card"><div style="opacity:0.7; margin-bottom:0.5rem;">Error Rate</div><div class="stat-value aquamarine">0.8%</div><div style="font-size:0.85rem; margin-top:0.5rem; color:var(--success);"><i class="fas fa-arrow-down"></i> 0.3% improvement</div></div>
+                    <div class="stat-card"><div style="opacity:0.7; margin-bottom:0.5rem;">Avg Processing Time</div><div class="stat-value oxford">4.2 min</div><div style="font-size:0.85rem; margin-top:0.5rem; color:var(--success);"><i class="fas fa-arrow-down"></i> 18% faster</div></div>
+                    <div class="stat-card"><div style="opacity:0.7; margin-bottom:0.5rem;">On-Time Delivery</div><div class="stat-value success">98.5%</div><div style="font-size:0.85rem; margin-top:0.5rem; color:var(--success);"><i class="fas fa-check"></i> Target met</div></div>
+                </div>
+                <h3 class="section-title" style="margin-top:3rem;"><i class="fas fa-wand-magic-sparkles"></i> AI Recommendations</h3>
+                <div class="cards-grid">
+                    <div class="card normal"><h4>Process Optimization</h4><p style="opacity:0.7; margin:1rem 0;">Implement validation rule for orders >$1000 requiring manager approval. Could prevent 3 high-value errors weekly.</p><button class="btn btn-secondary btn-small" onclick="alert('✓ Recommendation applied!')">Apply</button></div>
+                    <div class="card normal"><h4>Workflow Efficiency</h4><p style="opacity:0.7; margin:1rem 0;">Batch by product type instead of region. Analysis shows 8 additional minutes savings per batch.</p><button class="btn btn-secondary btn-small" onclick="alert('✓ Recommendation applied!')">Apply</button></div>
+                    <div class="card normal"><h4>Resource Allocation</h4><p style="opacity:0.7; margin:1rem 0;">Peak volume 2-4 PM. Consider scheduling extra staff to reduce exception queue during peak times.</p><button class="btn btn-secondary btn-small" onclick="alert('✓ Recommendation applied!')">Apply</button></div>
+                </div>
+            </div>
+
+            <!-- SETTINGS -->
+            <div id="page-settings" class="page hidden">
+                <h2 class="section-title"><i class="fas fa-sliders"></i> Settings</h2>
+                <div style="max-width:600px;">
+                    <div class="stat-card" style="margin-bottom:1.5rem;">
+                        <h3 style="margin-bottom:1rem;">Account Settings</h3>
+                        <label style="display:block; margin-bottom:1rem; font-weight:600;">User Name</label>
+                        <input type="text" class="form-input" value="Admin User">
+                        <label style="display:block; margin-bottom:1rem; font-weight:600;">Email</label>
+                        <input type="email" class="form-input" value="admin@ordercart.com">
+                    </div>
+                    <div class="stat-card" style="margin-bottom:1.5rem;">
+                        <h3 style="margin-bottom:1rem;">AI Configuration</h3>
+                        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; margin-bottom:0.75rem;"><input type="checkbox" checked> Enable AI Image Extraction</label>
+                        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; margin-bottom:0.75rem;"><input type="checkbox" checked> Enable AI Voice Commands</label>
+                        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; margin-bottom:0.75rem;"><input type="checkbox" checked> Enable AI Batch Suggestions</label>
+                        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;"><input type="checkbox" checked> Enable AI Exception Detection</label>
+                    </div>
+                    <div class="stat-card">
+                        <h3 style="margin-bottom:1rem;">Appearance</h3>
+                        <button class="btn btn-secondary btn-small" onclick="app.toggleTheme()"><i class="fas fa-palette"></i> Toggle Dark Mode</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HELP -->
+            <div id="page-help" class="page hidden">
+                <h2 class="section-title"><i class="fas fa-circle-question"></i> Help & Documentation</h2>
+                <div style="max-width:800px;">
+                    <div class="stat-card" style="margin-bottom:1.5rem;">
+                        <h3><i class="fas fa-inbox"></i> Capture Orders</h3>
+                        <p style="margin-top:1rem; opacity:0.8;">Use the Capture Hub to add orders from multiple channels: Camera, Voice, File Import, or Manual Entry. AI automatically extracts and validates order data instantly.</p>
+                    </div>
+                    <div class="stat-card" style="margin-bottom:1.5rem;">
+                        <h3><i class="fas fa-tasks"></i> Manage Orders</h3>
+                        <p style="margin-top:1rem; opacity:0.8;">Track orders through 7 stages: New → Validated → Paid → Picking → Packed → Shipped → Delivered. Drag-and-drop to update status instantly with color-coded priority indicators.</p>
+                    </div>
+                    <div class="stat-card" style="margin-bottom:1.5rem;">
+                        <h3><i class="fas fa-triangle-exclamation"></i> Handle Exceptions</h3>
+                        <p style="margin-top:1rem; opacity:0.8;">System categorizes errors in plain English and offers AI-powered solutions. Apply fixes with one click or customize manually. Send professional responses automatically.</p>
+                    </div>
+                    <div class="stat-card" style="margin-bottom:1.5rem;">
+                        <h3><i class="fas fa-boxes"></i> Batch Processing</h3>
+                        <p style="margin-top:1rem; opacity:0.8;">AI recommends optimal batches based on geography, products, and deadlines. See time savings before creating. Bulk print labels, update statuses, send notifications at once.</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-envelope"></i> Communications</h3>
+                        <p style="margin-top:1rem; opacity:0.8;">Send professional, personalized messages automatically via email or SMS. Choose from pre-built templates and schedule for later. View complete communication history per order.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- NOTIFICATION MODAL -->
+    <div class="modal" id="notificationModal">
+        <div class="modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border-light);">
+                <h2>Notifications</h2>
+                <button class="close-btn" onclick="document.getElementById('notificationModal').classList.remove('show');">&times;</button>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:1rem;">
+                <div style="padding:1rem; background:rgba(239,68,68,0.1); border-left:3px solid var(--danger); border-radius:8px;"><strong style="color:var(--danger);">2 orders approaching deadline</strong><p style="opacity:0.7; margin-top:0.5rem;">ORD-001 (2h), ORD-004 (3h)</p></div>
+                <div style="padding:1rem; background:rgba(16,185,129,0.1); border-left:3px solid var(--success); border-radius:8px;"><strong style="color:var(--success);">2 new exceptions flagged</strong><p style="opacity:0.7; margin-top:0.5rem;">Payment issue, Inventory conflict</p></div>
+                <div style="padding:1rem; background:rgba(127,255,212,0.1); border-left:3px solid var(--aquamarine); border-radius:8px;"><strong style="color:var(--aquamarine);">Batch suggestion available</strong><p style="opacity:0.7; margin-top:0.5rem;">California Orders (22 min savings)</p></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const app = {
+            init() {
+                this.setupTheme();
+                this.setupListeners();
+            },
+            setupTheme() {
+                if (localStorage.getItem('ordercart-theme') === 'dark') document.body.classList.add('dark-mode');
+            },
+            setupListeners() {
+                document.getElementById('themeBtn').onclick = () => this.toggleTheme();
+                document.getElementById('notificationsBtn').onclick = () => document.getElementById('notificationModal').classList.add('show');
+                document.getElementById('menuBtn').onclick = () => document.getElementById('sidebar').style.display = document.getElementById('sidebar').style.display === 'none' ? 'block' : 'none';
+            },
+            goToPage(page) {
+                document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+                document.getElementById('page-' + page).classList.remove('hidden');
+                document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+                event.target.closest('.sidebar-item')?.classList.add('active');
+                window.scrollTo(0, 0);
+            },
+            toggleTheme() {
+                document.body.classList.toggle('dark-mode');
+                localStorage.setItem('ordercart-theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            },
+            selectCapture(type) { alert('✓ ' + type.toUpperCase() + ' mode selected'); },
+            updateOrder(id) { alert('✓ Order ' + id + ' processing started'); },
+            shipOrder(id) { alert('✓ Order ' + id + ' marked as shipped'); },
+            filterTab(filter) { alert('✓ Filter: ' + filter); },
+            applyFix(id) { alert('✓ AI fix applied for ' + id); },
+            loadTemplate() { document.getElementById('msgPreview').value = 'Message template loaded...'; }
+        };
+        app.init();
+    </script>
+</body>
+</html>
