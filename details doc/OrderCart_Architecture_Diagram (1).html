@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrderCart - Architecture Diagram</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --oxford-blue: #002147;
+            --aquamarine: #7FFFD4;
+            --bg-light: #f5f7fa;
+            --bg-dark: #1a1a1a;
+            --card-light: #ffffff;
+            --card-dark: #2a2a2a;
+            --text-light: #333333;
+            --text-dark: #e0e0e0;
+            --border-light: #e0e0e0;
+            --border-dark: #404040;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-light);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .header {
+            background: var(--oxford-blue);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--aquamarine);
+            color: var(--oxford-blue);
+            border: none;
+            padding: 1rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .diagram-section {
+            background: var(--card-light);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .diagram-section {
+            background: var(--card-dark);
+        }
+
+        .diagram-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--oxford-blue);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        body.dark-mode .diagram-title {
+            color: var(--aquamarine);
+        }
+
+        .diagram-container {
+            width: 100%;
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .legend-item {
+            background: rgba(127,255,212,0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--aquamarine);
+        }
+
+        .legend-item h4 {
+            color: var(--oxford-blue);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        body.dark-mode .legend-item h4 {
+            color: var(--aquamarine);
+        }
+
+        .legend-item p {
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        .architecture-notes {
+            background: var(--oxford-blue);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        .architecture-notes h3 {
+            color: var(--aquamarine);
+            margin-bottom: 1rem;
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .note-item {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .note-item h4 {
+            color: var(--aquamarine);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .note-item ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .note-item li {
+            margin: 0.5rem 0;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .note-item li::before {
+            content: "•";
+            color: var(--aquamarine);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* Mermaid diagram styling */
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .theme-toggle {
+                top: 1rem;
+                right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+
+    <header class="header">
+        <h1>OrderCart Architecture</h1>
+        <p>AI-Powered Multi-Agent Order Management System</p>
+    </header>
+
+    <div class="container">
+        <!-- System Overview Diagram -->
+        <div class="diagram-section">
+            <h2 class="diagram-title">System Architecture Overview</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    graph TB
+                        %% User Inputs
+                        U1[📷 Photo Capture] --> WA
+                        U2[🎤 Voice Input] --> WA
+                        U3[📄 File Upload] --> WA
+                        U4[⌨️ Manual Entry] --> WA
+                        U5[📧 Email Sync] --> WA
+
+                        %% Web Application
+                        WA[🌐 OrderCart WebApp<br/>Cloud Run Service<br/>HTML/CSS/JS Frontend] --> API{REST API Gateway}
+
+                        %% AI Agents
+                        API --> A1[🤖 ADK-001<br/>Intake & Validation Agent<br/>Cloud Run Service]
+                        API --> A2[🤖 ADK-002<br/>Fulfillment Processor Agent<br/>Cloud Run Service]
+                        API --> A3[🤖 ADK-003<br/>Exception Handler Agent<br/>Cloud Run Service]
+
+                        %% Agent Interactions
+                        A1 -->|Validated Orders| A2
+                        A1 -->|Exception Orders| A3
+                        A2 -->|Communication Requests| A3
+                        A3 -->|Resolved Orders| A2
+
+                        %% Shared Services
+                        A1 --> FS[(🗄️ Firestore<br/>Order Database)]
+                        A2 --> FS
+                        A3 --> FS
+                        
+                        A1 --> PS[📡 Pub/Sub<br/>Message Queue]
+                        A2 --> PS
+                        A3 --> PS
+
+                        %% AI Model
+                        A1 --> AI[🧠 Gemma AI Model<br/>Google Cloud AI]
+                        A2 --> AI
+                        A3 --> AI
+
+                        %% Outputs
+                        A2 --> OUT1[📊 Status Updates]
+                        A2 --> OUT2[📦 Batch Processing]
+                        A3 --> OUT3[📧 Customer Communications]
+                        A3 --> OUT4[🚨 Exception Resolutions]
+
+                        %% Styling
+                        classDef webapp fill:#7FFFD4,stroke:#002147,stroke-width:3px,color:#002147
+                        classDef agent fill:#002147,stroke:#7FFFD4,stroke-width:2px,color:#7FFFD4
+                        classDef storage fill:#f9f9f9,stroke:#666,stroke-width:2px,color:#333
+                        classDef ai fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:#0277bd
+                        classDef input fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#f57c00
+                        classDef output fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#2e7d32
+
+                        class WA webapp
+                        class A1,A2,A3 agent
+                        class FS,PS storage
+                        class AI ai
+                        class U1,U2,U3,U4,U5 input
+                        class OUT1,OUT2,OUT3,OUT4 output
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Flow Diagram -->
+        <div class="diagram-section">
+            <h2 class="diagram-title">Order Processing Data Flow</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    sequenceDiagram
+                        participant User as 👤 Business User
+                        participant WA as 🌐 Web App
+                        participant A1 as 🤖 Intake Agent
+                        participant A2 as 🤖 Processor Agent
+                        participant A3 as 🤖 Exception Agent
+                        participant DB as 🗄️ Firestore
+                        participant AI as 🧠 Gemma AI
+
+                        User->>WA: Submit Order (Photo/Voice/File)
+                        WA->>A1: Raw Order Data
+                        A1->>AI: Extract & Normalize Data
+                        AI-->>A1: Structured Order Object
+                        A1->>A1: Apply Validation Rules
+                        
+                        alt Order Valid
+                            A1->>DB: Store Order (status: Validated)
+                            A1->>A2: Order Ready for Processing
+                            A2->>A2: Suggest Batches
+                            A2->>WA: Status Update
+                            WA-->>User: Order Accepted
+                        else Order Invalid
+                            A1->>DB: Store Order (status: Exception)
+                            A1->>A3: Exception for Analysis
+                            A3->>AI: Analyze Error
+                            AI-->>A3: Resolution Suggestion
+                            A3->>WA: Exception Alert
+                            WA-->>User: Review Required
+                        end
+
+                        User->>WA: Process Batch
+                        WA->>A2: Execute Batch Action
+                        A2->>DB: Update Order Statuses
+                        A2->>A3: Generate Communications
+                        A3->>AI: Create Customer Messages
+                        AI-->>A3: Professional Email Content
+                        A3-->>User: Automated Customer Updates
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent Responsibilities -->
+        <div class="legend">
+            <div class="legend-item">
+                <h4>🤖 Intake & Validation Agent (ADK-001)</h4>
+                <p>System gateway that receives raw order data, normalizes formats, applies validation rules, detects duplicates, and routes orders to processing or exception queues.</p>
+            </div>
+
+            <div class="legend-item">
+                <h4>🤖 Fulfillment Processor Agent (ADK-002)</h4>
+                <p>Workflow manager that handles validated orders, suggests optimal batches using clustering algorithms, executes bulk actions, and manages status transitions.</p>
+            </div>
+
+            <div class="legend-item">
+                <h4>🤖 Exception Handler Agent (ADK-003)</h4>
+                <p>Problem solver that analyzes exceptions, suggests resolutions, generates professional customer communications, and provides guided workflows for issue resolution.</p>
+            </div>
+
+            <div class="legend-item">
+                <h4>🌐 Web Application Service</h4>
+                <p>Frontend interface built with HTML5, CSS3, and Vanilla JavaScript that provides the user interface, coordinates API calls, and manages client-side interactions.</p>
+            </div>
+        </div>
+
+        <!-- Architecture Notes -->
+        <div class="architecture-notes">
+            <h3>🏗️ Technical Implementation Details</h3>
+            <div class="notes-grid">
+                <div class="note-item">
+                    <h4>Cloud Run Services</h4>
+                    <ul>
+                        <li>4 independent containerized services</li>
+                        <li>Serverless auto-scaling architecture</li>
+                        <li>Pay-per-use cost optimization</li>
+                        <li>Independent deployment and updates</li>
+                    </ul>
+                </div>
+
+                <div class="note-item">
+                    <h4>AI Integration</h4>
+                    <ul>
+                        <li>Google Agent Development Kit (ADK)</li>
+                        <li>Gemma AI model for cost efficiency</li>
+                        <li>Natural language processing</li>
+                        <li>Pattern recognition and clustering</li>
+                    </ul>
+                </div>
+
+                <div class="note-item">
+                    <h4>Data Management</h4>
+                    <ul>
+                        <li>Firestore for centralized order storage</li>
+                        <li>Pub/Sub for inter-agent messaging</li>
+                        <li>Real-time synchronization</li>
+                        <li>Firebase Auth for user management</li>
+                    </ul>
+                </div>
+
+                <div class="note-item">
+                    <h4>Communication Flow</h4>
+                    <ul>
+                        <li>REST API between web app and agents</li>
+                        <li>Event-driven agent coordination</li>
+                        <li>Structured data passing (Order objects)</li>
+                        <li>Real-time status updates</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#7FFFD4',
+                primaryTextColor: '#002147',
+                primaryBorderColor: '#002147',
+                lineColor: '#002147',
+                secondaryColor: '#002147',
+                tertiaryColor: '#f9f9f9'
+            }
+        });
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const toggle = document.querySelector('.theme-toggle');
+            
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                toggle.textContent = '🌙';
+                // Reinitialize mermaid with light theme
+                mermaid.initialize({
+                    startOnLoad: true,
+                    theme: 'default',
+                    themeVariables: {
+                        primaryColor: '#7FFFD4',
+                        primaryTextColor: '#002147',
+                        primaryBorderColor: '#002147',
+                        lineColor: '#002147',
+                        secondaryColor: '#002147',
+                        tertiaryColor: '#f9f9f9'
+                    }
+                });
+            } else {
+                body.classList.add('dark-mode');
+                toggle.textContent = '☀️';
+                // Reinitialize mermaid with dark theme
+                mermaid.initialize({
+                    startOnLoad: true,
+                    theme: 'dark',
+                    themeVariables: {
+                        primaryColor: '#7FFFD4',
+                        primaryTextColor: '#7FFFD4',
+                        primaryBorderColor: '#7FFFD4',
+                        lineColor: '#7FFFD4',
+                        secondaryColor: '#002147',
+                        tertiaryColor: '#2a2a2a'
+                    }
+                });
+            }
+            
+            // Re-render diagrams
+            location.reload();
+        }
+
+        // Console welcome message
+        console.log('%cOrderCart Architecture Diagram', 'color: #002147; font-size: 24px; font-weight: bold;');
+        console.log('%cMulti-Agent AI System Architecture', 'color: #7FFFD4; font-size: 14px;');
+    </script>
+</body>
+</html>
